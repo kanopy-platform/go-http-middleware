@@ -9,6 +9,12 @@ test: ## Run tests in local environment
 	go test -short -cover -run=$(RUN) $(PKG)
 
 
+license-gen:
+	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 cache
+	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 status
+	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 notices
+
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

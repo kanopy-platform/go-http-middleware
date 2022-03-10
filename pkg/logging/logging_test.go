@@ -34,7 +34,7 @@ func TestLoggingMiddleware(t *testing.T) {
 
 	// assert middleware
 	m := NewLogrus(WithLogrus(logger))
-	m.Middeleware(handler).ServeHTTP(rr, req)
+	m.Middleware(handler).ServeHTTP(rr, req)
 	assert.NoError(t, writer.Flush())
 	assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
 	assert.Equal(t, http.StatusOK, rr.Code)

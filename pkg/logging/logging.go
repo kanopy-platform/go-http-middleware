@@ -33,7 +33,7 @@ func NewLogrus(opts ...LogrusOptionFunc) middleware.Provider {
 	return l
 }
 
-func (m *logrusMiddleware) Middeleware(next http.Handler) http.Handler {
+func (m *logrusMiddleware) Middleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 
 		// Execute the chain of handlers, while capturing HTTP metrics: code, bytes-written, duration

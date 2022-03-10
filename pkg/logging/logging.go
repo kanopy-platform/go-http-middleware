@@ -5,14 +5,35 @@ import (
 	"strings"
 
 	"github.com/felixge/httpsnoop"
+	"github.com/kanopy-platform/go-http-middleware/pkg/middleware"
 	log "github.com/sirupsen/logrus"
 )
 
-func New() func(http.Handler) http.Handler {
-	return commonLogMiddleware
+type logrusMiddleware struct {
+	log *log.Logger
 }
 
-func commonLogMiddleware(next http.Handler) http.Handler {
+type LogrusOptionFunc func(*logrusMiddleware)
+
+func WithLogrus(l *log.Logger) func(*logrusMiddleware) {
+	return func(lm *logrusMiddleware) {
+		lm.log = l
+	}
+}
+
+func NewLogrus(opts ...LogrusOptionFunc) middleware.Provider {
+	l := &logrusMiddleware{
+		log: log.StandardLogger(),
+	}
+
+	for _, opt := range opts {
+		opt(l)
+	}
+
+	return l
+}
+
+func (m *logrusMiddleware) Middeleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 
 		// Execute the chain of handlers, while capturing HTTP metrics: code, bytes-written, duration
@@ -29,7 +50,7 @@ func commonLogMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		log.WithFields(log.Fields{
+		m.log.WithFields(log.Fields{
 			"host":       host,
 			"method":     r.Method,
 			"path":       r.URL.Path,

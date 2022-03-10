@@ -26,13 +26,15 @@ func TestLoggingMiddleware(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(FakeHandler)
 
+	// setup logrus
 	var capture bytes.Buffer
-
 	writer := bufio.NewWriter(&capture)
-	log.SetOutput(writer)
-	logger := New()
+	logger := log.New()
+	logger.SetOutput(writer)
 
-	logger(handler).ServeHTTP(rr, req)
+	// assert middleware
+	m := NewLogrus(WithLogrus(logger))
+	m.Middeleware(handler).ServeHTTP(rr, req)
 	assert.NoError(t, writer.Flush())
 	assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
 	assert.Equal(t, http.StatusOK, rr.Code)

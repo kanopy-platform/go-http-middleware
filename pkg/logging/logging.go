@@ -29,7 +29,6 @@ func commonLogMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		// Combined log format
 		log.WithFields(log.Fields{
 			"host":       host,
 			"method":     r.Method,

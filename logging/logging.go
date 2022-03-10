@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/felixge/httpsnoop"
-	"github.com/kanopy-platform/go-http-middleware/pkg/middleware"
+	middleware "github.com/kanopy-platform/go-http-middleware"
 	log "github.com/sirupsen/logrus"
 )
 

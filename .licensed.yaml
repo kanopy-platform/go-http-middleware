@@ -1,7 +1,7 @@
 sources:
   go: true
 source_path:
-  - pkg/**/*
+  - ./**/*
 allowed:
   - mit
   - apache-2.0

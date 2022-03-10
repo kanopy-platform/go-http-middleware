@@ -9,16 +9,9 @@ trigger:
 workspace:
   path: /go/src/github.com/${DRONE_REPO}
 
-volumes:
-  - name: cache
-    temp: {}
-
 steps:
   - name: test
     image: golangci/golangci-lint:v1.38.0-alpine
-    volumes:
-      - name: cache
-        path: /go
     commands:
       - apk add make
       - make test

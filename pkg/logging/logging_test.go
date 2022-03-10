@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,11 +29,11 @@ func TestLoggingMiddleware(t *testing.T) {
 	var capture bytes.Buffer
 
 	writer := bufio.NewWriter(&capture)
-	logger := New(WithIOWriter(writer))
+	log.SetOutput(writer)
+	logger := New()
 
 	logger(handler).ServeHTTP(rr, req)
 	assert.NoError(t, writer.Flush())
-
-	assert.Contains(t, capture.String(), "GET /some-path HTTP")
+	assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
 	assert.Equal(t, http.StatusOK, rr.Code)
 }

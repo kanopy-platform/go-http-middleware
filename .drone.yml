@@ -1,0 +1,24 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+trigger:
+  branch: [main]
+
+workspace:
+  path: /go/src/github.com/${DRONE_REPO}
+
+steps:
+  - name: test
+    image: golangci/golangci-lint:v1.38.0-alpine
+    commands:
+      - apk add make
+      - make test
+
+  - name: license-check
+    image: public.ecr.aws/kanopy/licensed-go:3.4.4
+    commands:
+      - licensed cache
+      - licensed status
+

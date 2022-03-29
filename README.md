@@ -1,5 +1,7 @@
 # go-http-middleware
 
+[![Build Status](https://drone.corp.mongodb.com/api/badges/kanopy-platform/go-http-middleware/status.svg)](https://drone.corp.mongodb.com/kanopy-platform/go-http-middleware)
+
 The `go-http-middleware` is a collection of generic HTTP middleware functions.
 
 ## Design Guidelines

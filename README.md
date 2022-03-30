@@ -6,9 +6,8 @@ The `go-http-middleware` is a collection of generic HTTP middleware functions.
 
 ## Design Guidelines
 
-* Middleware MUST NOT rely on external application specific state
-* Middleware MAY add information to the request context for downstream use.
-* Generic Middleware MUST not interrupt the chain. It MUST always call the next handler.
+* Middleware MUST follow [loose coupling](https://en.wikipedia.org/wiki/Loose_coupling) principles
+* Middleware MAY add information to the request context
 
 Refer to [logrus](./logging/logrus.go) as an example of the middleware design.
 

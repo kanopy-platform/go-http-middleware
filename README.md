@@ -11,6 +11,8 @@ The `go-http-middleware` is a collection of generic HTTP middleware functions.
 
 Refer to [logrus](./logging/logrus.go) as an example of the middleware design.
 
-## Logging
+## Middleware
+
+### Logging
 
 * logrus - Provides standardized HTTP Access structured logging via the third-party logrus package.

@@ -2,14 +2,13 @@
 
 [![Build Status](https://drone.corp.mongodb.com/api/badges/kanopy-platform/go-http-middleware/status.svg)](https://drone.corp.mongodb.com/kanopy-platform/go-http-middleware)
 
-The `go-http-middleware` is a collection of generic HTTP middleware functions.
+`go-http-middleware` is a collection of generic HTTP middleware functions.
 
-## Design Guidelines
+Refer to the [Contributing Guidelines](./CONTRIBUTING.md) to get started.
 
-* Middleware MUST follow [loose coupling](https://en.wikipedia.org/wiki/Loose_coupling) principles
-* Middleware MAY add information to the request context
+## Release Management
 
-Refer to [logrus](./logging/logrus.go) as an example of the middleware design.
+Upon merge to mainline use Github's interface to create a new release following standard [senver](https://semver.org/) standards.  e.g. `v1.2.3`. 
 
 ## Middleware
 

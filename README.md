@@ -8,7 +8,7 @@ Refer to the [Contributing Guidelines](./CONTRIBUTING.md) to get started.
 
 ## Release Management
 
-Upon merge to mainline use Github's interface to create a new release following standard [senver](https://semver.org/) standards.  e.g. `v1.2.3`. 
+Upon merge to mainline use Github's interface to create a new release following standard [semver](https://semver.org/) standards.  e.g. `v1.2.3`. 
 
 ## Middleware
 

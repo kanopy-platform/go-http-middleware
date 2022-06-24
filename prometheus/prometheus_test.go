@@ -9,6 +9,8 @@ import (
 )
 
 func TestMiddleware(t *testing.T) {
+	t.Parallel()
+
 	req, err := http.NewRequest("GET", "/", nil)
 	assert.NoError(t, err)
 
@@ -21,6 +23,7 @@ func TestMiddleware(t *testing.T) {
 	h.ServeHTTP(rr, req)
 
 	prom.Handler().ServeHTTP(rr, req)
-	assert.Contains(t, rr.Body.String(), `http_request_total{code="200",handler="/",method="get"} 2`)
-	assert.Contains(t, rr.Body.String(), `http_request_duration_seconds_count{code="200",handler="/",method="get"} 2`)
+	body := rr.Body.String()
+	assert.Contains(t, body, `http_request_total{code="200",handler="/",method="get"} 2`)
+	assert.Contains(t, body, `http_request_duration_seconds_count{code="200",handler="/",method="get"} 2`)
 }

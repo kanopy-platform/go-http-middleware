@@ -8,12 +8,14 @@ test: ## Run tests in local environment
 	golangci-lint run --timeout=5m $(PKG)
 	go test -short -cover -run=$(RUN) $(PKG)
 
+.PHONY: license-check
+license-check:
+	licensed cache
+	licensed status
 
-license-gen:
-	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 cache
-	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 status
-	docker run -it -v ${PWD}/:/app/ public.ecr.aws/kanopy/licensed-go:3.4.4 notices
-
+.PHONY: docker-license-check
+docker-license-check:
+	@docker run --entrypoint make -v $(shell pwd):/app public.ecr.aws/kanopy/licensed-go license-check
 
 .PHONY: help
 help:

@@ -1,3 +1,4 @@
+---
 sources:
   go: true
 source_path:
@@ -11,4 +12,5 @@ allowed:
   - isc
 reviewed:
   go:
-   - golang.org/x/**/* # bsd-style
+    - golang.org/x/**/*  # bsd-style
+    - google.golang.org/protobuf/**/*  # bsd

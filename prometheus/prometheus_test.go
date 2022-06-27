@@ -16,7 +16,8 @@ func TestMiddleware(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	prom := New()
+	prom := New(WithDurationBuckets(1, 2, 3))
+	assert.Equal(t, []float64{1, 2, 3}, prom.durationBuckets)
 
 	h := prom.Middleware("/", http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 	h.ServeHTTP(rr, req)

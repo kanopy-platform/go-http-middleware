@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -32,7 +33,7 @@ func New(opts ...OptionFunc) *Prometheus {
 
 	labelNames := []string{"code", "handler", "method"}
 
-	m.counter = prometheus.NewCounterVec(
+	m.counter = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "http_request_total",
 			Help: "A counter for http requests.",
@@ -40,7 +41,7 @@ func New(opts ...OptionFunc) *Prometheus {
 		labelNames,
 	)
 
-	m.duration = prometheus.NewHistogramVec(
+	m.duration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:    "http_request_duration_seconds",
 			Help:    "A histogram of latencies for http requests.",
@@ -48,9 +49,6 @@ func New(opts ...OptionFunc) *Prometheus {
 		},
 		labelNames,
 	)
-
-	prometheus.MustRegister(m.counter)
-	prometheus.MustRegister(m.duration)
 
 	return m
 }

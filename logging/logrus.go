@@ -1,10 +1,12 @@
 package logging
 
 import (
+	"maps"
 	"net/http"
+	"net/http/httptest"
 	"strings"
+	"time"
 
-	"github.com/felixge/httpsnoop"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,9 +36,8 @@ func NewLogrus(opts ...LogrusOptionFunc) *LogrusMiddleware {
 
 func (m *LogrusMiddleware) Middleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-
-		// Execute the chain of handlers, while capturing HTTP metrics: code, bytes-written, duration
-		metrics := httpsnoop.CaptureMetrics(next, w, r)
+		start := time.Now()
+		recorder := httptest.NewRecorder()
 
 		host := r.Header.Get("x-forwarded-for")
 		if host == "" {
@@ -49,16 +50,24 @@ func (m *LogrusMiddleware) Middleware(next http.Handler) http.Handler {
 			}
 		}
 
+		next.ServeHTTP(recorder, r)
+
+		maps.Copy(w.Header(), recorder.Header())
+		w.WriteHeader(recorder.Code)
+		w.Write(recorder.Body.Bytes())
+
+		duration := time.Since(start)
+
 		m.log.WithFields(log.Fields{
 			"host":       host,
 			"method":     r.Method,
 			"path":       r.URL.Path,
 			"proto":      r.Proto,
-			"status":     metrics.Code,
-			"bytes":      metrics.Written,
+			"status":     recorder.Code,
+			"bytes":      recorder.Body.Len(),
 			"referer":    r.Header.Get("referer"),
 			"user_agent": r.Header.Get("user-agent"),
-			"time_ms":    metrics.Duration.Milliseconds(),
+			"time_ms":    duration.Milliseconds(),
 		}).Info("handled")
 	}
 	return http.HandlerFunc(fn)

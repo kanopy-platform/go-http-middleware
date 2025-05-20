@@ -14,7 +14,7 @@ import (
 )
 
 func FakeHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(w, `{"retval": "done"}`)
 }
@@ -35,7 +35,12 @@ func TestLoggingMiddleware(t *testing.T) {
 	// assert middleware
 	m := NewLogrus(WithLogrus(logger))
 	m.Middleware(handler).ServeHTTP(rr, req)
+
+	expectedAttrs := []string{fmt.Sprintf("bytes=%d", rr.Body.Len()), "method=GET", "path=/some-path", "proto=HTTP/1.1"}
+
 	assert.NoError(t, writer.Flush())
-	assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
-	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, http.StatusCreated, rr.Code)
+	for _, attr := range expectedAttrs {
+		assert.Contains(t, capture.String(), attr)
+	}
 }

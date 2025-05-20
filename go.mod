@@ -3,7 +3,6 @@ module github.com/kanopy-platform/go-http-middleware
 go 1.18
 
 require (
-	github.com/felixge/httpsnoop v1.0.2
 	github.com/prometheus/client_golang v1.12.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0

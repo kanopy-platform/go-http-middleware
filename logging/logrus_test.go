@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,22 +22,45 @@ func FakeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestLoggingMiddleware(t *testing.T) {
-	req, err := http.NewRequest("GET", "/some-path", nil)
-	assert.NoError(t, err)
+	cases := []struct {
+		name             string
+		loggerMiddleware func(w io.Writer) Middleware
+	}{
+		{
+			name: "logrusMiddleware",
+			loggerMiddleware: func(w io.Writer) Middleware {
+				logger := log.New()
+				logger.SetOutput(w)
 
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(FakeHandler)
+				return NewLogrus(WithLogrus(logger))
+			},
+		},
+		{
+			name: "slogMiddleware",
+			loggerMiddleware: func(w io.Writer) Middleware {
+				return NewSlog(WithSlog(slog.New(slog.NewTextHandler(w, nil))))
+			},
+		},
+	}
 
-	// setup logrus
-	var capture bytes.Buffer
-	writer := bufio.NewWriter(&capture)
-	logger := log.New()
-	logger.SetOutput(writer)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			req, err := http.NewRequest("GET", "/some-path", nil)
+			assert.NoError(t, err)
 
-	// assert middleware
-	m := NewLogrus(WithLogrus(logger))
-	m.Middleware(handler).ServeHTTP(rr, req)
-	assert.NoError(t, writer.Flush())
-	assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
-	assert.Equal(t, http.StatusOK, rr.Code)
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(FakeHandler)
+
+			// setup logrus
+			var capture bytes.Buffer
+			writer := bufio.NewWriter(&capture)
+
+			// assert middleware
+			m := tc.loggerMiddleware(writer)
+			m.Middleware(handler).ServeHTTP(rr, req)
+			assert.NoError(t, writer.Flush())
+			assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
+			assert.Equal(t, http.StatusOK, rr.Code)
+		})
+	}
 }

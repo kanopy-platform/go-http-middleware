@@ -3,6 +3,7 @@ package logging
 import (
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/felixge/httpsnoop"
@@ -22,7 +23,7 @@ func WithSlog(l *slog.Logger) func(*SlogMiddleware) {
 
 func NewSlog(opts ...SlogOptionFunc) *SlogMiddleware {
 	l := &SlogMiddleware{
-		log: slog.Default(),
+		log: slog.New(slog.NewTextHandler(os.Stderr, nil)),
 	}
 
 	for _, opt := range opts {

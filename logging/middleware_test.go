@@ -10,8 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
-
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,22 +22,27 @@ func FakeHandler(w http.ResponseWriter, r *http.Request) {
 
 func TestLoggingMiddleware(t *testing.T) {
 	cases := []struct {
-		name             string
-		loggerMiddleware func(w io.Writer) Middleware
+		name              string
+		loggingMiddleware func(writer io.Writer) func(next http.Handler) http.Handler
 	}{
 		{
 			name: "logrusMiddleware",
-			loggerMiddleware: func(w io.Writer) Middleware {
-				logger := log.New()
-				logger.SetOutput(w)
-
-				return NewLogrus(WithLogrus(logger))
+			loggingMiddleware: func(writer io.Writer) func(next http.Handler) http.Handler {
+				logger := logrus.New()
+				logger.SetOutput(writer)
+				lr := NewLogrus(WithLogrus(logger))
+				return func(next http.Handler) http.Handler {
+					return lr.Middleware(next)
+				}
 			},
 		},
 		{
 			name: "slogMiddleware",
-			loggerMiddleware: func(w io.Writer) Middleware {
-				return NewSlog(WithSlog(slog.New(slog.NewTextHandler(w, nil))))
+			loggingMiddleware: func(writer io.Writer) func(next http.Handler) http.Handler {
+				s := NewSlog(WithSlog(slog.New(slog.NewTextHandler(writer, nil))))
+				return func(next http.Handler) http.Handler {
+					return s.Middleware(next)
+				}
 			},
 		},
 	}
@@ -56,8 +60,8 @@ func TestLoggingMiddleware(t *testing.T) {
 			writer := bufio.NewWriter(&capture)
 
 			// assert middleware
-			m := tc.loggerMiddleware(writer)
-			m.Middleware(handler).ServeHTTP(rr, req)
+			tc.loggingMiddleware(writer)(handler).ServeHTTP(rr, req)
+
 			assert.NoError(t, writer.Flush())
 			assert.Contains(t, capture.String(), "method=GET path=/some-path proto=HTTP")
 			assert.Equal(t, http.StatusOK, rr.Code)

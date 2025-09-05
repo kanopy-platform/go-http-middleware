@@ -15,9 +15,12 @@ import (
 )
 
 func FakeHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(w, `{"retval": "done"}`)
+	if _, err := fmt.Fprint(w, `{"retval": "done"}`); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func TestLoggingMiddleware(t *testing.T) {

@@ -14,4 +14,3 @@ reviewed:
   go:
     - golang.org/x/**/* # bsd-style
     - google.golang.org/protobuf/**/* # bsd
-    - log/slog # bsd-style

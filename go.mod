@@ -1,6 +1,6 @@
 module github.com/kanopy-platform/go-http-middleware
 
-go 1.24
+go 1.25
 
 require (
 	github.com/felixge/httpsnoop v1.0.2
